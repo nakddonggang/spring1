@@ -5,4 +5,9 @@
 
 <configuration>
 
+	<!-- parameterType이나 resultType에 com.study.domain은 생략한 채로 표현하는 것 가능 -->
+	<typeAliases>
+		<package name="com.study.domain"/>
+	</typeAliases>
+	
 </configuration>
