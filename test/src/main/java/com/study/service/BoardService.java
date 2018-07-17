@@ -3,6 +3,7 @@ package com.study.service;
 import java.util.List;
 
 import com.study.domain.BoardVO;
+import com.study.domain.Criteria;
 
 public interface BoardService {
 	public void regist(BoardVO board)throws Exception;
@@ -10,4 +11,6 @@ public interface BoardService {
 	public void modify(BoardVO board)throws Exception;
 	public void remove(int bno)throws Exception;
 	public List<BoardVO> listAll()throws Exception;
+	public List<BoardVO> listCriteria(Criteria cri)throws Exception;
+	public int listCountCriteria(Criteria cri)throws Exception;
 }

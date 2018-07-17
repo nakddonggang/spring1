@@ -7,12 +7,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.study.domain.BoardVO;
+import com.study.domain.Criteria;
+import com.study.domain.PageMaker;
 import com.study.service.BoardService;
 
 @Controller
@@ -33,25 +36,31 @@ public class BoardController {
 	public String registPOST(BoardVO board, RedirectAttributes rttr)throws Exception{
 		service.regist(board);
 		rttr.addFlashAttribute("msg", "SUCCESS");
-		return "redirect:/board/listAll";
+		return "redirect:/board/listPage";
 	}
 	
-	@RequestMapping(value="/listAll", method = RequestMethod.GET)
-	public void listAll(Model model)throws Exception{
-		model.addAttribute("list", service.listAll());
+	@RequestMapping(value="/listPage", method = RequestMethod.GET)
+	public void listPage(@ModelAttribute("cri")Criteria cri, Model model)throws Exception{
+		model.addAttribute("list", service.listCriteria(cri));
+		
+		PageMaker pageMaker = new PageMaker();
+		pageMaker.setCri(cri);
+		pageMaker.setTotalCount(service.listCountCriteria(cri));
+		
+		model.addAttribute("pageMaker", pageMaker);
 	}
 	
 	@RequestMapping(value = "/read", method = RequestMethod.GET)
 	public void read(@RequestParam("bno") int bno, Model model)throws Exception{
-		model.addAttribute(service.read(bno));	// ÀÌ¸§ ¾øÀÌ µ¥ÀÌÅÍ ³ÖÀ¸¸é ÀÚµ¿À¸·Î Å¬·¡½ºÀÇ ÀÌ¸§À» ¼Ò¹®ÀÚ·Î ½ÃÀÛÇØ¼­ »ç¿ë
-												// ÀÌ °æ¿ì¿¡´Â BoardVO Å¬·¡½ºÀÇ °´Ã¼ÀÌ¹Ç·Î, boardVO¶ó´Â ÀÌ¸§À¸·Î ÀúÀåµÊ
+		model.addAttribute(service.read(bno));	// ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ ï¿½Ò¹ï¿½ï¿½Ú·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ ï¿½ï¿½ï¿½
+												// ï¿½ï¿½ ï¿½ï¿½ì¿¡ï¿½ï¿½ BoardVO Å¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ã¼ï¿½Ì¹Ç·ï¿½, boardVOï¿½ï¿½ï¿½ ï¿½Ì¸ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
 	}
 	
 	@RequestMapping(value="/remove", method=RequestMethod.POST)
 	public String remove(@RequestParam("bno") int bno, RedirectAttributes rttr)throws Exception{
 		service.remove(bno);
 		rttr.addFlashAttribute("msg", "SUCCESS");
-		return "redirect:/board/listAll";
+		return "redirect:/board/listPage";
 	}
 	
 	@RequestMapping(value="/modify", method=RequestMethod.GET)
@@ -63,6 +72,8 @@ public class BoardController {
 	public String modifyPOST(BoardVO board, RedirectAttributes rttr)throws Exception{
 		service.modify(board);
 		rttr.addFlashAttribute("msg", "SUCCESS");
-		return "redirect:/board/listAll";
+		return "redirect:/board/listPage";
 	}
+	
+	
 }
