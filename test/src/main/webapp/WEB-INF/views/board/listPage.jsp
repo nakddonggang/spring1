@@ -60,7 +60,7 @@
 		</c:if>
 	</ul>
 </div>
-
+<div>${pageMaker.startPage}, ${pageMaker.endPage}</div>
 <script>
 	var result = "${msg}";
 	if(result=="SUCCESS") alert("처리가 완료되었습니다.");

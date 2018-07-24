@@ -28,7 +28,7 @@
 	</sql>
 	
 	<insert id="create">
-		insert into tbl_board(title,content,writer) values(#{title},#{content},#{writer})
+		insert into tbl_board(bno,title,content,writer) values(SEQ_TBL_BOARD_IDX.nextval,#{title},#{content},#{writer})
 	</insert>
 	
 	<select id="read" resultType="com.study.domain.BoardVO">
@@ -43,24 +43,34 @@
 		delete from tbl_board where bno=#{bno}
 	</delete>
 	
-	<select id="listAll" resultType="com.study.domain.BoardVO">
-		<![CDATA[
-		select bno,title,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc
-		]]>
-	</select>
+<!-- 	<select id="listAll" resultType="com.study.domain.BoardVO"> -->
+<!-- 		<![CDATA[ -->
+<!-- 		select bno,title,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc -->
+<!-- 		]]> -->
+<!-- 	</select> -->
 	
-	<select id="listPage" resultType="BoardVO">
-		<![CDATA[
-		select bno,title,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc limit #{page},10
-		]]>
-	</select>
+<!-- 	<select id="listPage" resultType="BoardVO"> -->
+<!-- 		<![CDATA[ -->
+<!-- 		select bno,title,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc limit #{page},10 -->
+<!-- 		]]> -->
+<!-- 	</select> -->
 	
 	<select id="listCriteria" resultType="BoardVO">
 		<![CDATA[
-		select bno,title,content,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc 
-		limit #{pageStart}, #{perPageNum}
+		SELECT * FROM ( 
+			SELECT /*+ INDEX_DESC(Z idx_bno) */ ROWNUM AS RNUM, Z.* FROM ( 
+				SELECT * FROM tbl_board
+			) Z WHERE ROWNUM <= #{perPageNum}
+		) WHERE RNUM >= #{pageStart}
 		]]>
 	</select>
+	
+<!-- 	<select id="listCriteria" resultType="BoardVO"> -->
+<!-- 		<![CDATA[ -->
+<!-- 		select bno,title,content,writer,regdate,viewcnt from tbl_board where bno>0 order by bno desc, regdate desc  -->
+<!-- 		limit #{pageStart}, #{perPageNum} -->
+<!-- 		]]> -->
+<!-- 	</select> -->
 	
 	<select id="countPaging" resultType="int">
 		<![CDATA[
@@ -68,15 +78,15 @@
 		]]>
 	</select>
 	
-	<select id="listSearch" resultType="BoardVO">
-	<![CDATA[
-		select * from tbl_board where bno>0
-	]]>
+<!-- 	<select id="listSearch" resultType="BoardVO"> -->
+<!-- 	<![CDATA[ -->
+<!-- 		select * from tbl_board where bno>0 -->
+<!-- 	]]> -->
 	
-		<include refid="search"></include>
+<!-- 		<include refid="search"></include> -->
 		
-		 order by bno desc limit #{pageStart}, #{perPageNum}
-	</select>
+<!-- 		 order by bno desc limit #{pageStart}, #{perPageNum} -->
+<!-- 	</select> -->
 	
 	<select id="listSearchCount" resultType="int">
 	<![CDATA[

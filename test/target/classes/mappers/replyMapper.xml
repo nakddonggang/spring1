@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.study.mapper.ReplyMapper">
+
+	<select id="list" resultType="ReplyVO">
+		select rno,bno,replytext,replyer,regdate,updatedate from tbl_reply where bno=#{bno} order by rno desc
+	</select>
+
+	<select id="listPage" resultType="ReplyVO">
+		<![CDATA[
+		select a.rnum, a.rno, a.bno, a.replytext, a.replyer, a.regdate, a.updatedate
+		from(
+    		select rownum as rnum, b.rno, b.bno, b.replytext, b.replyer, b.regdate, b.updatedate
+    		from(
+        		select rno, bno, replytext, replyer, regdate, updatedate
+        		from tbl_reply
+        		where bno = #{bno}
+				order by rno desc) b
+			where rownum <= #{cri.pageStart}+#{cri.perPageNum}-1) a
+		where a.rnum >= #{cri.pageStart}
+		]]>
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(bno) from tbl_reply where bno = #{bno}
+	</select>
+	
+	<insert id="create">
+		insert into tbl_reply(rno, bno, replytext, replyer)
+		values (SEQ_TBL_REPLY_IDX.nextval, #{bno}, #{replytext}, #{replyer})
+	</insert>
+	
+	<update id="update">
+		update tbl_reply set replytext = #{replytext}, updatedate = sysdate where rno = #{rno}
+	</update>
+	
+	<delete id="delete">
+		delete from tbl_reply where rno = #{rno}
+	</delete>
+
+</mapper>

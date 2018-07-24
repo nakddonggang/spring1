@@ -46,9 +46,13 @@ public class BoardController {
 		PageMaker pageMaker = new PageMaker();
 		pageMaker.setCri(cri);
 		pageMaker.setTotalCount(service.listCountCriteria(cri));
-		
 		model.addAttribute("pageMaker", pageMaker);
 	}
+	
+//	@RequestMapping(value="/listAll", method=RequestMethod.GET)
+//	public void listAll(Model model) throws Exception{
+//		model.addAttribute("list", service.listAll());
+//	}
 	
 	@RequestMapping(value = "/readPage", method = RequestMethod.GET)
 	public void read(@RequestParam("bno") int bno, @ModelAttribute("cri")Criteria cri ,Model model)throws Exception{
