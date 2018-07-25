@@ -44,9 +44,9 @@
 				<!-- /.box-body -->
 					
 				<div class="box-footer">
-					<button type="submit" class="btn btn-warning">Modify</button>
-					<button type="submit" class="btn btn-danger">Remove</button>
-					<button type="submit" class="btn btn-primary">List</button>
+					<button type="submit" class="btn btn-warning" id="modifyBtn">Modify</button>
+					<button type="submit" class="btn btn-danger" id="removeBtn">Remove</button>
+					<button type="submit" class="btn btn-primary" id="goListBtn">List</button>
 				</div>
 				
 			</div>
@@ -80,6 +80,28 @@
 			</div>
 		</div>
 	</div>
+	
+	<!-- Modal -->
+	<div id="modifyModal" class="modal modal-primary fade" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content -->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body" data-rno>
+					<p><input type="text" id="replytext" class="form-control"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-info" id="replyModBtn">Modify</button>
+					<button type="button" class="btn btn-danger" id="replyDelBtn">DELETE</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
 </section><!-- /.content -->
 
 <script id="template" type="text/x-handlebars-template">
@@ -103,9 +125,9 @@
 <script>
 	Handlebars.registerHelper("prettifyDate", function(timeValue){
 		var dateObj = new Date(timeValue);
-		var year = dataObj.getFullYear();
-		var month = dataObj.getMonth()+1;
-		var date = dataObj.getDate();
+		var year = dateObj.getFullYear();
+		var month = dateObj.getMonth()+1;
+		var date = dateObj.getDate();
 		return year+"/"+month+"/"+date;
 	});
 
@@ -131,7 +153,7 @@
 	
 	var printPaging = function(pageMaker, target){
 		var str = "";
-		
+		alert(pageMaker.endPage);
 		if(pageMaker.prev)	str += "<li><a href='"+(pageMaker.startPage)+"'> << </a></li>";
 		
 		for(var i=pageMaker.startPage, len=pageMaker.endPage; i<=len; i++){
@@ -143,32 +165,9 @@
 		
 		target.html(str);
 	}
-</script>
-
-<script>
-$(document).ready(function(){
-	var formObj = $("form[role='form']");
-	console.log(formObj);
-	
-	$(".btn-warning").on("click", function(){
-		formObj.attr("action", "/sboard/modifyPage");
-		formObj.attr("method", "get");
-		formObj.submit();
-	});
-	
-	$(".btn-danger").on("click", function(){
-		formObj.attr("action", "/sboard/removePage");
-		formObj.submit();
-	});
-	
-	$(".btn-primary").on("click", function(){
-		formObj.attr("method", "get");
-		formObj.attr("action", "/sboard/list");
-		formObj.submit();
-	});
 	
 	$("#repliesDiv").on("click", function(){
-		if($(".timeline li").size()>1){
+		if(jQuery(".timeline li").length>1){
 			return;
 		}
 		getPage("/replies/"+bno+"/1");
@@ -181,7 +180,7 @@ $(document).ready(function(){
 	});
 	
 	$("#replyAddBtn").on("click", function(){
-		var replyerObj = $("newReplyWriter");
+		var replyerObj = $("#newReplyWriter");
 		var replytextObj = $("#newReplyText");
 		var replyer = replyerObj.val();
 		var replytext = replytextObj.val();
@@ -207,6 +206,82 @@ $(document).ready(function(){
 			}
 		});
 	});
+	
+	$(".timeline").on("click", ".replyLi", function(event){
+		var reply = $(this);
+		
+		$("#replytext").val(reply.find('.timeline-body').text());
+		$(".modal-title").html(reply.attr("data-rno"));
+	});
+	
+	$("#replyModBtn").on("click", function(){
+		var rno = $(".modal-title").html();
+		var replytext = $("#replytext").val();
+		
+		$.ajax({
+			type:'put',
+			url:'/replies/'+rno,
+			headers:{
+				"Content-Type":"application/json",
+				"X-HTTP-Method-Override":"PUT"
+			},
+			data: JSON.stringify({replytext:replytext}),
+			dataType:'text',
+			success:function(result){
+				console.log("result: "+result);
+				if(result=="SUCCESS"){
+					alert("수정 되었습니다.");
+					getPage("/replies/"+bno+"/"+replyPage);
+				}
+			}
+		});
+	});
+	
+	$("#replyDelBtn").on("click", function(){
+		var rno = $(".modal-title").html();
+		var replytext = $("#replytext").val();
+		
+		$.ajax({
+			type:'delete',
+			url:'/replies/'+rno,
+			headers:{
+				"Content-Type":"application/json",
+				"X-HTTP-Method-Override":"DELETE"
+			},
+			dataType:'text',
+			success:function(result){
+				console.log("result: "+result);
+				if(result=="SUCCESS"){
+					alert("삭제 되었습니다.");
+					getPage("/replies/"+bno+"/"+replyPage);
+				}
+			}
+		});
+	});
+</script>
+
+<script>
+$(document).ready(function(){
+	var formObj = $("form[role='form']");
+	console.log(formObj);
+	
+	$("#modifyBtn").on("click", function(){
+		formObj.attr("action", "/board/modifyPage");
+		formObj.attr("method", "get");
+		formObj.submit();
+	});
+	
+	$("#removeBtn").on("click", function(){
+		formObj.attr("action", "/board/removePage");
+		formObj.submit();
+	});
+	
+	$("#goListBtn").on("click", function(){
+		formObj.attr("method", "get");
+		formObj.attr("action", "/board/listPage");
+		formObj.submit();
+	});
+	
 });
 </script>
 

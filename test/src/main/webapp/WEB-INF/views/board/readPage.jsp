@@ -42,9 +42,9 @@
 				<!-- /.box-body -->
 					
 				<div class="box-footer">
-					<button type="submit" class="btn btn-warning">Modify</button>
-					<button type="submit" class="btn btn-danger">Remove</button>
-					<button type="submit" class="btn btn-primary">List</button>
+					<button type="submit" class="btn btn-warning" id="modifyBtn">Modify</button>
+					<button type="submit" class="btn btn-danger" id="removeBtn">Remove</button>
+					<button type="submit" class="btn btn-primary" id="goListBtn">List</button>
 				</div>
 				
 			</div>
@@ -205,11 +205,56 @@
 		});
 	});
 	
-	$(".timeline").on("click", "replyLi", function(event){
+	$(".timeline").on("click", ".replyLi", function(event){
 		var reply = $(this);
 		
 		$("#replytext").val(reply.find('.timeline-body').text());
 		$(".modal-title").html(reply.attr("data-rno"));
+	});
+	
+	$("#replyModBtn").on("click", function(){
+		var rno = $(".modal-title").html();
+		var replytext = $("#replytext").val();
+		
+		$.ajax({
+			type:'put',
+			url:'/replies/'+rno,
+			headers:{
+				"Content-Type":"application/json",
+				"X-HTTP-Method-Override":"PUT"
+			},
+			data: JSON.stringify({replytext:replytext}),
+			dataType:'text',
+			success:function(result){
+				console.log("result: "+result);
+				if(result=="SUCCESS"){
+					alert("수정 되었습니다.");
+					getPage("/replies/"+bno+"/"+replyPage);
+				}
+			}
+		});
+	});
+	
+	$("#replyDelBtn").on("click", function(){
+		var rno = $(".modal-title").html();
+		var replytext = $("#replytext").val();
+		
+		$.ajax({
+			type:'delete',
+			url:'/replies/'+rno,
+			headers:{
+				"Content-Type":"application/json",
+				"X-HTTP-Method-Override":"DELETE"
+			},
+			dataType:'text',
+			success:function(result){
+				console.log("result: "+result);
+				if(result=="SUCCESS"){
+					alert("삭제 되었습니다.");
+					getPage("/replies/"+bno+"/"+replyPage);
+				}
+			}
+		});
 	});
 </script>
 
@@ -218,18 +263,18 @@ $(document).ready(function(){
 	var formObj = $("form[role='form']");
 	console.log(formObj);
 	
-	$(".btn-warning").on("click", function(){
+	$("#modifyBtn").on("click", function(){
 		formObj.attr("action", "/board/modifyPage");
 		formObj.attr("method", "get");
 		formObj.submit();
 	});
 	
-	$(".btn-danger").on("click", function(){
+	$("#removeBtn").on("click", function(){
 		formObj.attr("action", "/board/removePage");
 		formObj.submit();
 	});
 	
-	$(".btn-primary").on("click", function(){
+	$("#goListBtn").on("click", function(){
 		formObj.attr("method", "get");
 		formObj.attr("action", "/board/listPage");
 		formObj.submit();

@@ -96,4 +96,8 @@
 		
 	</select>
 	
+	<update id="updateViewcnt">
+		update tbl_board set viewcnt = viewcnt+1 where bno = #{bno}
+	</update>
+	
 </mapper>
